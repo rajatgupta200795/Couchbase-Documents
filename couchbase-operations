@@ -1,0 +1,48 @@
+Query to check all executed query 
+Select * from system_completed_requests order by time desc limit 40;
+Select * from system_active_requests order by time desc limit 40;
+Select * from system_prepareds order by time desc limit 40;
+
+Particular User
+select * From system:completed_requests where users = 'user';
+
+Cluster Node down and up
+On node type
+Cd /etc/init.d/
+./couchbase_server status
+./couchbase_server start
+./couchbase-server stop
+
+Clear Disk
+Cd /var/log
+Cp docker /mnt/datadisk/
+> docker
+
+We need to use these command here
+Df-h
+
+
+Take Backup
+ ./cbbackup  -c http://127.0.0.1.8091 /mnt/datadisk/  -u “Administrator” -p "password" -b lap 
+
+Rebalance 
+./couchbase-cli rebalance --cluster=127.0.0.1:8091  --user “Administrator” --password “password” --server-remove= 10.0.100.111
+
+Upload backup on s3
+aws s3 cp lee.zip s3://glp-cb-data/rvl-glp-nfr/
+	
+Restore Backup
+sudo /opt/couchbase/bin/cbrestore http://localhost8091 /mnt/datadisk/ -u “Administrator” -p “pass”
+
+Change Password
+sudo ./couchbase-cli reset-admin-password -c localhost:8091 -u “Administrator” -p “pswd” --new-password “yDz~Wx?)zC37-k@#”
+
+Clear Cache
+delete from dcms where id like '%-B-%'
+delete from dcms where id like '%-token'
+
+
+BS System Restart
+Sudo systemctl status couchbase-server
+Sudo systemctl restart couchbase-server
+
