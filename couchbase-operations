@@ -1,16 +1,27 @@
 Query to check all executed query 
-Select * from system_completed_requests order by time desc limit 40;
-Select * from system_active_requests order by time desc limit 40;
-Select * from system_prepareds order by time desc limit 40;
+Select * from system:completed_requests order by time desc limit 40;
+Select * from system:active_requests order by time desc limit 40;
+Select * from system:prepareds order by time desc limit 40;
 
 Particular User
 select * From system:completed_requests where users = 'user';
 
+Frequently used query
+update ams set runMode="DEBUG" where id='536907999719_CONFIG'
+Update led set learningModel.configurations.courseMastery.PreAssessment.mastery = 0 where id ='37425223270'
+Select learningModel.configurations.courseMastery.PreAssessment.mastery from where id ='1537425223270'
+
+Go To Server :
+eval $(ssh-agent)
+ssh-add -k key
+ssh -A admin@bastin
+ssh ec2-user@private-ip
+
 Cluster Node down and up
 On node type
 Cd /etc/init.d/
-./couchbase_server status
-./couchbase_server start
+./couchbase-server status
+./couchbase-server start
 ./couchbase-server stop
 
 Clear Disk
@@ -19,30 +30,61 @@ Cp docker /mnt/datadisk/
 > docker
 
 We need to use these command here
-Df-h
+Df -h
+Du -sh *
 
+Deal with Buckets
+Cd /opt/bin/
+./couchbase-cli ………….
 
 Take Backup
- ./cbbackup  -c http://127.0.0.1.8091 /mnt/datadisk/  -u “Administrator” -p "password" -b lap 
+ ./cbbackup http://127.0.0.1:8091 /mnt/datadisk/backup/ -u Administrator -p "password" -b lap 
 
 Rebalance 
-./couchbase-cli rebalance --cluster=127.0.0.1:8091  --user “Administrator” --password “password” --server-remove= 10.0.100.111
+./couchbase-cli rebalance --cluster=127.0.0.1:8091  --user Administrator --password 'yDz~Wx?)zC37-k@#' --server-remove= 10.0.100.111
 
 Upload backup on s3
-aws s3 cp lee.zip s3://glp-cb-data/rvl-glp-nfr/
-	
+Zip -r file.zip dir
+aws s3 cp file.zip s3://path/
+
 Restore Backup
-sudo /opt/couchbase/bin/cbrestore http://localhost8091 /mnt/datadisk/ -u “Administrator” -p “pass”
+sudo wget https://s3.amazonaws.com/path.zip
+sudo unzip lee.zip
+sudo /opt/couchbase/bin/cbrestore /mnt/datadisk/backup/ http://localhost:8091 -b imc -u Administrator -p ‘pass’
+sudo /opt/couchbase/bin/cbrestore /backup/2018-12-15T180101Z-full/  http://localhost:8091 -b lad -u admin -p pswd
+
+
+Delete View
+curl -v -X DELETE -H 'Content-Type: application/json' -u Administrator:'pass' http://localhost:8092/lee/_design/view_name
 
 Change Password
-sudo ./couchbase-cli reset-admin-password -c localhost:8091 -u “Administrator” -p “pswd” --new-password “yDz~Wx?)zC37-k@#”
+sudo ./couchbase-cli reset-admin-password -c localhost:8091 -u Administrator -p Devops2018 --new-password 'yDz~Wx?)zC37-k@#'
 
 Clear Cache
 delete from dcms where id like '%-B-%'
 delete from dcms where id like '%-token'
 
+Pillow Fight
+# Only needed during first-time setup:
+wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-x86_64.rpm
+sudo rpm -iv couchbase-release-1.0-4-x86_64.rpm
+# Will install or upgrade existing packages
+sudo yum install libcouchbase-devel libcouchbase2-bin gcc gcc-c++
 
-BS System Restart
-Sudo systemctl status couchbase-server
-Sudo systemctl restart couchbase-server
+./cbc-pillowfight -U couchbase://localhost/roster -I 1000000 --json -u Administrator -P password
 
+
+i=7
+a=`jq '.results[7].index_key' index.json`
+b=`jq '.results[7].keyspace_id' index.json`
+c=`jq '.results[7].name' index.json`
+if [ "$a" == '[]' ]; then
+    echo 'create primary  index '$c' on '$b
+else
+    echo 'create index '$c' on '$b' '$a
+fi;
+
+for k in $(jq '.children.values | keys | .[]' file); do value=$(jq -r ".children.values[$k]" file); name=$(jq -r '.path.name' <<< "$value"); type=$(jq -r '.type' <<< "$value"); size=$(jq -r '.size' <<< "$value"); printf '%s\t%s\t%s\n' "$name" "$type" "$size"; done | column -t -s$'\t'
+tail -n + 4
+
+/opt/couchbase/bin/cbq -u ${adminUsername} -p ${adminPassword} --script="CREATE INDEX bindingModelS ON dcms(model)";
