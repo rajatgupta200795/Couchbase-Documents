@@ -24,4 +24,3 @@ file_contents3=$(<index.txt)
 echo "${file_contents3//\"/ }" > index.txt
 rm -rf mid-index.txt
 sed "s/)(0)/[0]/g;s/)(1)/[1]/g;s/)(2)/[2]/g" index.txt>new-index.txt
-new-index.txt>index.txt
