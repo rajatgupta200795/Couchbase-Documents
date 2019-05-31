@@ -41,7 +41,7 @@ Take Backup
  ./cbbackup http://127.0.0.1:8091 /mnt/datadisk/backup/ -u Administrator -p "password" -b lap 
 
 Rebalance 
-./couchbase-cli rebalance --cluster=127.0.0.1:8091  --user Administrator --password 'yDz~Wx?)zC37-k@#' --server-remove= 10.0.100.111
+./couchbase-cli rebalance --cluster=127.0.0.1:8091  --user Administrator --password 'pswd' --server-remove= 10.0.100.111
 
 Upload backup on s3
 Zip -r file.zip dir
@@ -49,16 +49,15 @@ aws s3 cp file.zip s3://path/
 
 Restore Backup
 sudo wget https://s3.amazonaws.com/path.zip
-sudo unzip lee.zip
 sudo /opt/couchbase/bin/cbrestore /mnt/datadisk/backup/ http://localhost:8091 -b imc -u Administrator -p ‘pass’
-sudo /opt/couchbase/bin/cbrestore /backup/2018-12-15T180101Z-full/  http://localhost:8091 -b lad -u admin -p pswd
+sudo /opt/couchbase/bin/cbrestore /backup/  http://localhost:8091 -b lad -u admin -p pswd
 
 
-Delete View
+Delete V
 curl -v -X DELETE -H 'Content-Type: application/json' -u Administrator:'pass' http://localhost:8092/lee/_design/view_name
 
 Change Password
-sudo ./couchbase-cli reset-admin-password -c localhost:8091 -u Administrator -p Devops2018 --new-password 'yDz~Wx?)zC37-k@#'
+sudo ./couchbase-cli reset-admin-password -c localhost:8091 -u Administrator -p Devops2018 --new-password 'pswd'
 
 Clear Cache
 delete from dcms where id like '%-B-%'
@@ -87,4 +86,4 @@ fi;
 for k in $(jq '.children.values | keys | .[]' file); do value=$(jq -r ".children.values[$k]" file); name=$(jq -r '.path.name' <<< "$value"); type=$(jq -r '.type' <<< "$value"); size=$(jq -r '.size' <<< "$value"); printf '%s\t%s\t%s\n' "$name" "$type" "$size"; done | column -t -s$'\t'
 tail -n + 4
 
-/opt/couchbase/bin/cbq -u ${adminUsername} -p ${adminPassword} --script="CREATE INDEX bindingModelS ON dcms(model)";
+/opt/couchbase/bin/cbq -u ${adminUsername} -p ${adminPassword} --script="";
